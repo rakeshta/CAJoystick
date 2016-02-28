@@ -16,6 +16,7 @@
 		143242C11C7E8E0D007E31C3 /* CAJoystick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 143242BA1C7E8E0D007E31C3 /* CAJoystick.framework */; };
 		143242C21C7E8E0D007E31C3 /* CAJoystick.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 143242BA1C7E8E0D007E31C3 /* CAJoystick.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		143242CA1C7E8F54007E31C3 /* CAJoystickControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143242C91C7E8F54007E31C3 /* CAJoystickControl.swift */; };
+		1457BDCB1C836F250056A90B /* CAJoystickVector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1457BDCA1C836F250056A90B /* CAJoystickVector.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		143242BC1C7E8E0D007E31C3 /* CAJoystick.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CAJoystick.h; sourceTree = "<group>"; };
 		143242BE1C7E8E0D007E31C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		143242C91C7E8F54007E31C3 /* CAJoystickControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CAJoystickControl.swift; sourceTree = "<group>"; };
+		1457BDCA1C836F250056A90B /* CAJoystickVector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CAJoystickVector.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				143242BC1C7E8E0D007E31C3 /* CAJoystick.h */,
+				1457BDCA1C836F250056A90B /* CAJoystickVector.swift */,
 				143242C91C7E8F54007E31C3 /* CAJoystickControl.swift */,
 				143242C71C7E8E2E007E31C3 /* Supporting Files */,
 			);
@@ -262,6 +265,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1457BDCB1C836F250056A90B /* CAJoystickVector.swift in Sources */,
 				143242CA1C7E8F54007E31C3 /* CAJoystickControl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -529,6 +533,7 @@
 				143242B21C7E8DB7007E31C3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		143242C31C7E8E0D007E31C3 /* Build configuration list for PBXNativeTarget "CAJoystick" */ = {
 			isa = XCConfigurationList;
@@ -537,6 +542,7 @@
 				143242C51C7E8E0D007E31C3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

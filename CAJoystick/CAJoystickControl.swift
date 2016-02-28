@@ -22,6 +22,11 @@ public class CAJoystickControl: UIControl {
     public private(set) var value              = CGPoint.zero
     
     
+    // MARK: - Accessors
+    
+//    public var 
+    
+    
     // MARK: - IB Attributes
     
     public override var contentMode:             UIViewContentMode {
@@ -140,10 +145,35 @@ public class CAJoystickControl: UIControl {
 
 extension CAJoystickControl {
     
-    private var thumbCenter: CGPoint {
-        let x = CGRectGetWidth(bounds)  * (1.0 + value.x) / 2.0
-        let y = CGRectGetHeight(bounds) * (1.0 + value.y) / 2.0
-        return CGPoint(x: x, y: y)
+    private var thumbPositionForValue: CGPoint {
+        
+        // Block to convert value to coordinates
+        let scale = { (value: CGFloat, range: CGFloat) -> CGFloat in
+            
+            let rHalf = range / 2.0
+            if  value == 0 {
+                return rHalf
+            }
+            
+            let dMin  = rHalf * self.deadZone
+            let dMax  = rHalf * self.reach
+            return rHalf + dMin + (dMax - dMin) * value
+        }
+        
+        // Scale value x, y to coordinates
+        return CGPoint(x: scale(value.x, CGRectGetWidth(bounds)), y: scale(value.y, CGRectGetHeight(bounds)))
+    }
+    
+    private var valueForThumbPosition: CGPoint {
+        
+        // Block to convert coordinates to value
+        let invert = { (ordniate: CGFloat, range: CGFloat) -> CGFloat in
+            return 0.0
+        }
+        
+        // Scale coordinates to value x, y
+        let center = thumbImageView.center
+        return CGPoint(x: invert(center.x, CGRectGetWidth(bounds)), y: invert(center.y, CGRectGetHeight(bounds)))
     }
     
     public override func layoutSubviews() {
@@ -155,7 +185,7 @@ extension CAJoystickControl {
         // Layout
         let thumbWidth                         = round(min(CGRectGetWidth(bounds), CGRectGetHeight(bounds)) * thumbSize)
         thumbImageView.frame                   = CGRect(x: 0, y: 0, width: thumbWidth, height: thumbWidth)
-        thumbImageView.center                  = thumbCenter
+        thumbImageView.center                  = thumbPositionForValue
         thumbImageView.layer.cornerRadius      = min(CGRectGetWidth(thumbImageView.frame), CGRectGetHeight(thumbImageView.frame)) / 2.0
     }
 }

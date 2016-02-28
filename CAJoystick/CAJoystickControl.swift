@@ -13,8 +13,13 @@ public class CAJoystickControl: UIControl {
 
     // MARK: - Members
     
-    private let backgroundImageView            = UIImageView()
-    private let thumbImageView                 = UIImageView()
+    private let _backgroundImageView           = UIImageView()
+    private let _thumbImageView                = UIImageView()
+    
+    
+    // MARK: -
+    
+    private var _lastTouchPoint                = CGPoint.zero
     
     
     // MARK: -
@@ -26,10 +31,10 @@ public class CAJoystickControl: UIControl {
     
     public override var contentMode:             UIViewContentMode {
         get {
-            return backgroundImageView.contentMode
+            return _backgroundImageView.contentMode
         }
         set {
-            backgroundImageView.contentMode = contentMode
+            _backgroundImageView.contentMode = contentMode
         }
     }
     
@@ -38,19 +43,19 @@ public class CAJoystickControl: UIControl {
     
     public override var backgroundColor:         UIColor? {
         get {
-            return backgroundImageView.backgroundColor
+            return _backgroundImageView.backgroundColor
         }
         set {
-            backgroundImageView.backgroundColor = newValue
+            _backgroundImageView.backgroundColor = newValue
         }
     }
     
     @IBInspectable public var backgroundImage:   UIImage? {
         get {
-            return backgroundImageView.image
+            return _backgroundImageView.image
         }
         set {
-            backgroundImageView.image = newValue
+            _backgroundImageView.image = newValue
         }
     }
     
@@ -59,19 +64,19 @@ public class CAJoystickControl: UIControl {
     
     @IBInspectable public var thumbColor:        UIColor? {
         get {
-            return thumbImageView.backgroundColor
+            return _thumbImageView.backgroundColor
         }
         set {
-            thumbImageView.backgroundColor = newValue
+            _thumbImageView.backgroundColor = newValue
         }
     }
     
     @IBInspectable public var thumbImage:        UIImage? {
         get {
-            return thumbImageView.image
+            return _thumbImageView.image
         }
         set {
-            thumbImageView.image = newValue
+            _thumbImageView.image = newValue
         }
     }
 
@@ -122,16 +127,16 @@ public class CAJoystickControl: UIControl {
     private func postinit() {
         
         // Configure background image view
-        backgroundImageView.contentMode     = contentMode
-        backgroundImageView.backgroundColor = UIColor.lightGrayColor()
-        backgroundImageView.clipsToBounds   = true
-        addSubview(backgroundImageView)
+        _backgroundImageView.contentMode     = contentMode
+        _backgroundImageView.backgroundColor = UIColor.lightGrayColor()
+        _backgroundImageView.clipsToBounds   = true
+        addSubview(_backgroundImageView)
         
         // Configure thumb image view
-        thumbImageView.contentMode     = .ScaleAspectFit
-        thumbImageView.backgroundColor = UIColor.darkGrayColor()
-        thumbImageView.clipsToBounds   = true
-        addSubview(thumbImageView)
+        _thumbImageView.contentMode     = .ScaleAspectFit
+        _thumbImageView.backgroundColor = UIColor.darkGrayColor()
+        _thumbImageView.clipsToBounds   = true
+        addSubview(_thumbImageView)
     }
 }
 
@@ -167,21 +172,116 @@ extension CAJoystickControl {
         }
         
         // Scale coordinates to value x, y
-        let center = thumbImageView.center
+        let center = _thumbImageView.center
         return CAJoystickVector(dx: invert(center.x, CGRectGetWidth(bounds)), dy: invert(center.y, CGRectGetHeight(bounds)))
     }
     
     public override func layoutSubviews() {
         
         // Layout background image view
-        backgroundImageView.frame              = bounds
-        backgroundImageView.layer.cornerRadius = min(CGRectGetWidth(bounds), CGRectGetHeight(bounds)) / 2.0
+        _backgroundImageView.frame              = bounds
+        _backgroundImageView.layer.cornerRadius = min(CGRectGetWidth(bounds), CGRectGetHeight(bounds)) / 2.0
 
         // Layout
-        let thumbWidth                         = round(min(CGRectGetWidth(bounds), CGRectGetHeight(bounds)) * thumbSize)
-        thumbImageView.frame                   = CGRect(x: 0, y: 0, width: thumbWidth, height: thumbWidth)
-        thumbImageView.center                  = thumbPositionForValue
-        thumbImageView.layer.cornerRadius      = min(CGRectGetWidth(thumbImageView.frame), CGRectGetHeight(thumbImageView.frame)) / 2.0
+        let thumbWidth                          = round(min(CGRectGetWidth(bounds), CGRectGetHeight(bounds)) * thumbSize)
+        _thumbImageView.frame                   = CGRect(x: 0, y: 0, width: thumbWidth, height: thumbWidth)
+        _thumbImageView.center                  = thumbPositionForValue
+        _thumbImageView.layer.cornerRadius      = min(CGRectGetWidth(_thumbImageView.frame), CGRectGetHeight(_thumbImageView.frame)) / 2.0
+    }
+}
+
+
+// MARK: - Touch Tracking
+
+extension CAJoystickControl {
+    
+    private func isPointInsideThumb(p: CGPoint) -> Bool {
+        let r  = CGRectGetWidth(_thumbImageView.frame) / 2.0
+        let dx = p.x - r
+        let dy = p.y - r
+        return dx * dx + dy * dy < r * r
+    }
+    
+    
+    // MARK: -
+    
+    private func nudgeThumbPositionByDx(dx: CGFloat, dy: CGFloat, animated: Bool, notify: Bool) {
+        
+        // Block to nudge a coordinate while keeping it within bounds
+        let nudge   = { (x: CGFloat, dx: CGFloat, range: CGFloat) -> CGFloat in
+            let min = range * (1.0 - self.reach) / 2.0
+            let max = range - min
+            var xx  = x + dx
+            if  xx  < min {
+                xx  = min
+            }
+            if  xx  > max {
+                xx  = max
+            }
+            return xx
+        }
+        
+        // Determine the new position of the thumb
+        let newPos  = CGPoint(
+            x: nudge(_thumbImageView.center.x, dx, CGRectGetWidth(bounds)),
+            y: nudge(_thumbImageView.center.y, dy, CGRectGetHeight(bounds))
+        )
+        
+        // Update thumb position
+        setThumbPosition(newPos, animationDuration: animated ? 0.1 : 0.0, notify: notify)
+    }
+    
+    private func resetThumbPositionAnimated(animated: Bool, notify: Bool) {
+        setThumbPosition(CGPoint(x: CGRectGetMidX(bounds), y: CGRectGetMidX(bounds)), animationDuration: animated ? 0.3 : 0.0, notify: notify)
+    }
+    
+    private func setThumbPosition(position: CGPoint, animationDuration duration: NSTimeInterval, notify: Bool) {
+        
+        // Abort if no change in position
+        if  position == _thumbImageView.center {
+            return
+        }
+        
+        // Animate the change
+        UIView.animateWithDuration(duration, delay: 0.0, options: [.BeginFromCurrentState],
+            animations: {
+                self._thumbImageView.center = position
+            },
+            completion: nil
+        )
+        
+        // Generate change event if needed
+        if  notify {
+            self.sendActionsForControlEvents([.ValueChanged])
+        }
+    }
+    
+    
+    // MARK: -
+    
+    public override func beginTrackingWithTouch(touch: UITouch, withEvent event: UIEvent?) -> Bool {
+        _lastTouchPoint = touch.locationInView(_thumbImageView)
+        return isPointInsideThumb(_lastTouchPoint)
+    }
+    
+    public override func continueTrackingWithTouch(touch: UITouch, withEvent event: UIEvent?) -> Bool {
+        
+        let pp = touch.locationInView(_thumbImageView)
+        let dx = pp.x - _lastTouchPoint.x
+        let dy = pp.y - _lastTouchPoint.y
+        nudgeThumbPositionByDx(dx, dy: dy, animated: true, notify: true)
+        
+        return true
+    }
+    
+    public override func endTrackingWithTouch(touch: UITouch?, withEvent event: UIEvent?) {
+        _lastTouchPoint = CGPoint.zero
+        resetThumbPositionAnimated(true, notify: true)
+    }
+    
+    public override func cancelTrackingWithEvent(event: UIEvent?) {
+        _lastTouchPoint = CGPoint.zero
+        resetThumbPositionAnimated(true, notify: true)
     }
 }
 

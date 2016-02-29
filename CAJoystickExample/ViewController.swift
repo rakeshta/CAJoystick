@@ -73,6 +73,8 @@ extension ViewController {
     }
     
     @IBAction func segmentedControl_valueChanged(sender: UISegmentedControl) {
+        let reachByThemeNumber = [1: 0.6, 2: 0.4] as [Int: CGFloat]
+        
         switch sender.selectedSegmentIndex {
         case 0:
             joystickControl.backgroundColor = UIColor.lightGrayColor()
@@ -80,6 +82,7 @@ extension ViewController {
             joystickControl.thumbColor      = UIColor.darkGrayColor()
             joystickControl.thumbImage      = nil
             joystickControl.thumbSize       = 0.4
+            joystickControl.reach           = 0.8
             
         default:
             let index = sender.selectedSegmentIndex
@@ -88,6 +91,7 @@ extension ViewController {
             joystickControl.thumbColor      = nil
             joystickControl.thumbImage      = UIImage(named: String(format: "js_thumb_%02d.png",      arguments: [index]))
             joystickControl.thumbSize       = joystickControl.thumbImage!.size.width / joystickControl.bounds.size.width
+            joystickControl.reach           = reachByThemeNumber[index] ?? 0.8
         }
     }
 }

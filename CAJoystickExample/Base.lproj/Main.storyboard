@@ -27,12 +27,15 @@
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="YH9-b0-nBq">
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="YH9-b0-nBq">
                                 <rect key="frame" x="236" y="552" width="129" height="29"/>
                                 <segments>
                                     <segment title="Basic"/>
                                     <segment title="Themed"/>
                                 </segments>
+                                <connections>
+                                    <action selector="segmentedControl_valueChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="yMb-sw-2cl"/>
+                                </connections>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="y: 0.0000" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qBX-1z-v5D">
                                 <rect key="frame" x="20" y="491" width="276" height="21"/>
@@ -116,6 +119,7 @@
                         <outlet property="cursorView" destination="gzX-QA-N6G" id="XUD-6j-xoP"/>
                         <outlet property="dLabel" destination="HI2-xV-0OY" id="8FB-DA-4Vv"/>
                         <outlet property="joystickControl" destination="qsG-k8-4vK" id="YkF-XQ-gJz"/>
+                        <outlet property="segmentedControl" destination="YH9-b0-nBq" id="Map-SY-C5S"/>
                         <outlet property="xLabel" destination="b1g-lO-iW2" id="SWD-08-vIR"/>
                         <outlet property="yLabel" destination="qBX-1z-v5D" id="Pno-12-IBf"/>
                     </connections>

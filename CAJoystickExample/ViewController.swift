@@ -14,20 +14,22 @@ final internal class ViewController: UIViewController {
 
     // MARK: - IB Outlets
     
-    @IBOutlet weak var joystickControl: CAJoystickControl!
+    @IBOutlet weak var joystickControl:  CAJoystickControl!
     
-    @IBOutlet weak var xLabel:          UILabel!
-    @IBOutlet weak var yLabel:          UILabel!
+    @IBOutlet weak var segmentedControl: UISegmentedControl!
     
-    @IBOutlet weak var aLabel:          UILabel!
-    @IBOutlet weak var dLabel:          UILabel!
+    @IBOutlet weak var xLabel:           UILabel!
+    @IBOutlet weak var yLabel:           UILabel!
     
-    @IBOutlet weak var cursorView:      UIView!
+    @IBOutlet weak var aLabel:           UILabel!
+    @IBOutlet weak var dLabel:           UILabel!
+    
+    @IBOutlet weak var cursorView:       UIView!
     
     
     // MARK: - Members
     
-    private var displayLink:            CADisplayLink?
+    private var displayLink:             CADisplayLink?
 }
 
 
@@ -40,6 +42,9 @@ extension ViewController {
         
         // Update initial value display
         joystickControl_valueChanged(joystickControl)
+        
+        // Update initial theme
+        segmentedControl_valueChanged(segmentedControl)
         
         // Create display link to update cursor position
         displayLink = CADisplayLink(target: self, selector: "displayLinkTimerFired:")
@@ -65,6 +70,25 @@ extension ViewController {
         yLabel.text = String(format: "y: %+.4f", arguments: [sender.value.dy])
         aLabel.text = String(format: "%.4f :a", arguments: [sender.value.angle])
         dLabel.text = String(format: "%.4f :d", arguments: [sender.value.magnitude])
+    }
+    
+    @IBAction func segmentedControl_valueChanged(sender: UISegmentedControl) {
+        switch sender.selectedSegmentIndex {
+        case 0:
+            joystickControl.backgroundColor = UIColor.lightGrayColor()
+            joystickControl.backgroundImage = nil
+            joystickControl.thumbColor      = UIColor.darkGrayColor()
+            joystickControl.thumbImage      = nil
+            joystickControl.thumbSize       = 0.4
+            
+        default:
+            let index = sender.selectedSegmentIndex
+            joystickControl.backgroundColor = nil
+            joystickControl.backgroundImage = UIImage(named: String(format: "js_background_%02d.png", arguments: [index]))
+            joystickControl.thumbColor      = nil
+            joystickControl.thumbImage      = UIImage(named: String(format: "js_thumb_%02d.png",      arguments: [index]))
+            joystickControl.thumbSize       = joystickControl.thumbImage!.size.width / joystickControl.bounds.size.width
+        }
     }
 }
 

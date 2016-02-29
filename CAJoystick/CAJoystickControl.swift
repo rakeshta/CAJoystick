@@ -161,19 +161,28 @@ extension CAJoystickControl {
         }
         
         // Scale value x, y to coordinates
-        return CGPoint(x: scale(value.dx, CGRectGetWidth(bounds)), y: scale(value.dy, CGRectGetHeight(bounds)))
+        return CGPoint(x: scale(value.dx, CGRectGetWidth(bounds)), y: scale(-value.dy, CGRectGetHeight(bounds)))
     }
     
     private var valueForThumbPosition: CAJoystickVector {
         
         // Block to convert coordinates to value
-        let invert = { (ordniate: CGFloat, range: CGFloat) -> CGFloat in
-            return 0.0
+        let invert    = { (ordinate: CGFloat, range: CGFloat) -> CGFloat in
+            let rHalf = range / 2.0
+            let dd    = ordinate - rHalf
+            let dabs  = fabs(dd)
+            let dMin  = rHalf * self.deadZone
+            if  dabs  < dMin {
+                return 0.0
+            }
+            let dMax  = rHalf * self.reach
+            let vabs  = (dabs - dMin) / (dMax - dMin)
+            return dd < 0 ? -vabs : vabs
         }
         
         // Scale coordinates to value x, y
         let center = _thumbImageView.center
-        return CAJoystickVector(dx: invert(center.x, CGRectGetWidth(bounds)), dy: invert(center.y, CGRectGetHeight(bounds)))
+        return CAJoystickVector(dx: invert(center.x, CGRectGetWidth(bounds)), dy: -invert(center.y, CGRectGetHeight(bounds)))
     }
     
     public override func layoutSubviews() {
@@ -249,6 +258,9 @@ extension CAJoystickControl {
             },
             completion: nil
         )
+        
+        // Update value
+        value = valueForThumbPosition
         
         // Generate change event if needed
         if  notify {

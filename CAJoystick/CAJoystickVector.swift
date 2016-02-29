@@ -30,6 +30,9 @@ public struct CAJoystickVector {
     
     /// The angle in radians. Ranges from 0 to 2Pi.
     public var angle:        CGFloat {
+        if  dx == 0 && dy == 0 {
+            return 0.0
+        }
         let a = atan2(dx, dy)
         return a < 0.0 ? CGFloat(2.0 * M_PI) + a : a
     }
@@ -49,6 +52,20 @@ extension CAJoystickVector: Equatable {
 
 public func == (lhs: CAJoystickVector, rhs: CAJoystickVector) -> Bool {
     return lhs.dx == rhs.dx && lhs.dy == rhs.dy
+}
+
+
+// MARK: - Description
+
+extension CAJoystickVector: CustomStringConvertible, CustomDebugStringConvertible {
+    
+    public var description: String {
+        return "{\(dx), \(dy)}"
+    }
+    
+    public var debugDescription: String {
+        return description
+    }
 }
 
 

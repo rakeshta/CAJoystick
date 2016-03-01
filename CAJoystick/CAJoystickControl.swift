@@ -24,7 +24,7 @@ public class CAJoystickControl: UIControl {
     
     // MARK: -
     
-    public private(set) var value              = CAJoystickVector.zero
+    public private(set) var value              = CGVector.zero
     
     
     // MARK: - IB Attributes
@@ -164,7 +164,7 @@ extension CAJoystickControl {
         return CGPoint(x: scale(value.dx, CGRectGetWidth(bounds)), y: scale(-value.dy, CGRectGetHeight(bounds)))
     }
     
-    private var valueForThumbPosition: CAJoystickVector {
+    private var valueForThumbPosition: CGVector {
         
         // Block to convert coordinates to value
         let invert    = { (ordinate: CGFloat, range: CGFloat) -> CGFloat in
@@ -182,7 +182,7 @@ extension CAJoystickControl {
         
         // Scale coordinates to value x, y
         let center = _thumbImageView.center
-        return CAJoystickVector(dx: invert(center.x, CGRectGetWidth(bounds)), dy: -invert(center.y, CGRectGetHeight(bounds)))
+        return CGVector(dx: invert(center.x, CGRectGetWidth(bounds)), dy: -invert(center.y, CGRectGetHeight(bounds)))
     }
     
     public override func layoutSubviews() {

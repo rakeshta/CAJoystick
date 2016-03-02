@@ -26,6 +26,13 @@ extension CGVector {
         let a = atan2(dx, dy)
         return a < 0.0 ? CGFloat(2.0 * M_PI) + a : a
     }
+    
+    /// Returns the normal vector for this vector if the magnitude is greater
+    /// than zero. If the magnitude is zeor, the zero vector is returned.
+    public var normal:       CGVector {
+        let m = magnitude
+        return m > 0.0 ? CGVector(dx: dx / m, dy: dy / m) : self
+    }
 }
 
 

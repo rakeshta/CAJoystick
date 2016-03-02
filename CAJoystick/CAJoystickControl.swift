@@ -148,16 +148,14 @@ extension CAJoystickControl {
     private func thumbPositionForValue(value: CGVector) -> CGPoint {
         
         // Block to convert value to coordinates
-        let scale = { (value: CGFloat, range: CGFloat) -> CGFloat in
-            
+        let scale     = { (value: CGFloat, range: CGFloat) -> CGFloat in
             let rHalf = range / 2.0
             if  value == 0 {
                 return rHalf
             }
-            
             let dMin  = rHalf * self.deadZone
             let dMax  = rHalf * self.reach
-            return rHalf + dMin + (dMax - dMin) * value
+            return rHalf + (value > 0 ? dMin : -dMin) + (dMax - dMin) * value
         }
         
         // Scale value x, y to coordinates
@@ -230,21 +228,19 @@ extension CAJoystickControl {
         }
         
         // Determine the new position of the thumb
-        let newPos  = CGPoint(
+        var pos = CGPoint(
             x: nudge(_thumbImageView.center.x, dx, CGRectGetWidth(bounds)),
             y: nudge(_thumbImageView.center.y, dy, CGRectGetHeight(bounds))
         )
         
-        //
-        do {
-            let val = valueForThumbPosition(newPos)
-            if  val.magnitude > 1.0 {
-                
-            }
+        // If thumb moves outside the unit circle, restrain it back in.
+        let val = valueForThumbPosition(pos)
+        if  val.magnitude > 1.0 {
+            pos = thumbPositionForValue(val.normal)
         }
         
         // Update thumb position
-        setThumbPosition(newPos, animationDuration: animated ? 0.1 : 0.0, notify: notify)
+        setThumbPosition(pos, animationDuration: animated ? 0.1 : 0.0, notify: notify)
     }
     
     private func resetThumbPositionAnimated(animated: Bool, notify: Bool) {

@@ -145,7 +145,7 @@ public class CAJoystickControl: UIControl {
 
 extension CAJoystickControl {
     
-    private var thumbPositionForValue: CGPoint {
+    private func thumbPositionForValue(value: CGVector) -> CGPoint {
         
         // Block to convert value to coordinates
         let scale = { (value: CGFloat, range: CGFloat) -> CGFloat in
@@ -164,7 +164,7 @@ extension CAJoystickControl {
         return CGPoint(x: scale(value.dx, CGRectGetWidth(bounds)), y: scale(-value.dy, CGRectGetHeight(bounds)))
     }
     
-    private var valueForThumbPosition: CGVector {
+    private func valueForThumbPosition(position: CGPoint) -> CGVector {
         
         // Block to convert coordinates to value
         let invert    = { (ordinate: CGFloat, range: CGFloat) -> CGFloat in
@@ -181,8 +181,7 @@ extension CAJoystickControl {
         }
         
         // Scale coordinates to value x, y
-        let center = _thumbImageView.center
-        return CGVector(dx: invert(center.x, CGRectGetWidth(bounds)), dy: -invert(center.y, CGRectGetHeight(bounds)))
+        return CGVector(dx: invert(position.x, CGRectGetWidth(bounds)), dy: -invert(position.y, CGRectGetHeight(bounds)))
     }
     
     public override func layoutSubviews() {
@@ -194,7 +193,7 @@ extension CAJoystickControl {
         // Layout
         let thumbWidth                          = round(min(CGRectGetWidth(bounds), CGRectGetHeight(bounds)) * thumbSize)
         _thumbImageView.frame                   = CGRect(x: 0, y: 0, width: thumbWidth, height: thumbWidth)
-        _thumbImageView.center                  = thumbPositionForValue
+        _thumbImageView.center                  = thumbPositionForValue(value)
         _thumbImageView.layer.cornerRadius      = min(CGRectGetWidth(_thumbImageView.frame), CGRectGetHeight(_thumbImageView.frame)) / 2.0
     }
 }
@@ -236,6 +235,14 @@ extension CAJoystickControl {
             y: nudge(_thumbImageView.center.y, dy, CGRectGetHeight(bounds))
         )
         
+        //
+        do {
+            let val = valueForThumbPosition(newPos)
+            if  val.magnitude > 1.0 {
+                
+            }
+        }
+        
         // Update thumb position
         setThumbPosition(newPos, animationDuration: animated ? 0.1 : 0.0, notify: notify)
     }
@@ -260,7 +267,7 @@ extension CAJoystickControl {
         )
         
         // Update value
-        value = valueForThumbPosition
+        value = valueForThumbPosition(position)
         
         // Generate change event if needed
         if  notify {

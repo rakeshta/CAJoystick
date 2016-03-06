@@ -23,8 +23,7 @@ extension CGVector {
         if  dx == 0 && dy == 0 {
             return 0.0
         }
-        let a = atan2(dx, dy)
-        return a < 0.0 ? CGFloat(2.0 * M_PI) + a : a
+        return atan2(dx, dy)
     }
     
     /// Returns the normal vector for this vector if the magnitude is greater
